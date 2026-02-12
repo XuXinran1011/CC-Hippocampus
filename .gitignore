@@ -6,6 +6,9 @@
 # Memory history archives
 .hippocampus_history/
 
+# Installation scripts (temporary)
+install.log
+
 # Python
 __pycache__/
 *.py[cod]

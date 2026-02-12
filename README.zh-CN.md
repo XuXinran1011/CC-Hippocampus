@@ -4,68 +4,81 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Python: 3.7+](https://img.shields.io/badge/Python-3.7+-green.svg)](https://www.python.org/downloads/)
-[![Cross-Platform](https://img.shields.io/badge/Platform-macOS%20%7C%20Linux%20%7C%20Windows-lightgrey.svg)](#features)
 
 ---
 
-## 🎯 概述
+<div align="center">
 
-**适用范围**：本插件专为将 Claude Code 接入第三方大模型的用户设计。
+[English](README.md) | [简体中文](README.zh-CN.md) | [繁體中文](README.zh-TW.md)
 
-**CC-Hippocampus** 是 Claude Code 的外部记忆持久化插件，可在长时间开发会话期间防止上下文丢失。通过在上下文压缩之前将项目上下文、活跃任务和技术债务保存到磁盘，你永远不会丢失思路。
+</div>
 
-### 主要特性
+---
 
-- ✅ **原子持久化**：记忆写入是原子操作（写入→临时文件→重命名），防止损坏
-- ✅ **零配置**：运行 `/plugin add .` 后立即可用
-- ✅ **跨平台**：无需修改即可在 macOS、Linux 和 Windows 上运行
-- ✅ **自动加载**：会话开始时自动加载记忆
-- ✅ **安全压缩**：用安全的保存-清除工作流替换危险的 `/compact` 命令
-- ✅ **归档历史**：保留之前的状态以便恢复
+## 🎯 适用范围
 
-## 🚀 安装
+本插件专为**将 Claude Code 接入第三方大模型**的用户设计，用于解决上下文存储与压缩异常问题。
 
-1. 克隆或下载此仓库
+---
+
+## 🚀 安装（30 秒完成）
+
+### 方法 1：一键安装（推荐）
+
+复制下方命令直接运行：
+
+**Windows (PowerShell)**:
+```powershell
+irm https://raw.githubusercontent.com/XuXinran1011/CC-Hippocampus/main/install.ps1 | iex
+```
+
+**macOS/Linux (Terminal)**:
+```bash
+curl -fsSL https://raw.githubusercontent.com/XuXinran1011/CC-Hippocampus/main/install.sh | bash
+```
+
+**⚠️ 重要说明**:
+- ✅ 本安装**不会修改**您现有的 Claude Code 设置
+- ✅ 仅添加 CC-Hippocampus 插件、技能和一个钩子文件
+- ✅ 您现有的插件和设置保持不变
+
+### 方法 2：手动安装
+
+1. 克隆仓库：
+```bash
+git clone https://github.com/XuXinran1011/CC-Hippocampus.git
+```
+
 2. 在 Claude Code 中运行：
-   ```bash
-   /plugin add .
-   ```
-3. 完成！记忆管理现在是自动的。
+```bash
+/plugin add .
+```
+
+---
 
 ## 📖 使用方法
 
 ### 自动工作流（推荐）
 
-CC-Hippocampus **自动工作**：
+安装后，CC-Hippocampus 会自动工作：
 
 1. **会话开始**：自动加载记忆
-2. **上下文过高**：使用率达到 ~80% 时，保存记忆
+2. **上下文过高**：在 ~80% 时自动保存
 3. **用户清除**：提示运行 `/clear`
 4. **会话恢复**：自动恢复记忆
 
-### 手动命令
+### 手动技能
+
+安装后可以使用以下技能：
 
 ```bash
-# 加载记忆（通常自动）
-python tools/hippocampus.py load
-
-# 使用自定义 JSON 保存记忆
-python tools/hippocampus.py save '{
-  "project_context": "构建记忆管理器",
-  "active_tasks": [{"description": "测试原子写入"}],
-  "technical_debt": [],
-  "file_map": {}
-}'
-
-# 清除并归档当前记忆
-python tools/hippocampus.py clear
-
-# 查看记忆统计
-python tools/hippocampus.py stats
-
-# 快速添加任务
-python tools/hippocampus.py add-task "修复保存函数中的 bug" high
+/hippocampus-load    # 手动加载记忆
+/hippocampus-save    # 手动保存记忆
+/hippocampus-clear   # 清除并归档记忆
+/hippocampus-stats   # 查看记忆统计
 ```
+
+---
 
 ## 🧠 记忆结构
 
@@ -96,32 +109,38 @@ python tools/hippocampus.py add-task "修复保存函数中的 bug" high
 }
 ```
 
-## 🔧 架构
+---
 
-```
-CC-Hippocampus/
-├── tools/
-│   └── hippocampus.py       # 核心记忆管理器
-├── rules/
-│   └── hippocampus_policy.md # 行为协议
-├── .hippocampus.json         # 当前记忆（自动生成）
-└── .hippocampus_history/     # 归档状态
-```
+## ⚠️ 注意事项
 
-## ⚠️ 重要说明
+1. **切勿使用 `/compact`**
+   - 该命令会不可逆地销毁记忆
+   - 始终使用保存-清除工作流
 
-- **切勿使用 `/compact`**：它会不可逆地销毁记忆。始终使用保存-清除工作流。
-- **记忆位置**：`.hippocampus.json` 存储在项目根目录
-- **归档保留**：旧状态保存在 `.hippocampus_history/`（建议手动清理）
+2. **记忆文件位置**
+   - `.hippocampus.json` 存储在项目根目录
+   - 归档历史保存在 `.hippocampus_history/`
+
+3. **归档清理**
+   - 旧状态会一直保留（建议手动清理）
+
+4. **重置记忆**
+   ```bash
+   /hippocampus-clear  # 清除并归档
+   ```
+
+---
 
 ## 🐛 故障排除
 
 | 问题 | 解决方案 |
 |------|----------|
-| 记忆未加载 | 手动运行 `python tools/hippocampus.py load` |
+| 记忆未加载 | 手动运行 `/hippocampus-load` |
 | 保存失败 | 检查项目目录中的文件权限 |
 | JSON 损坏 | 删除 `.hippocampus.json` 并重新开始 |
 | 归档文件夹太大 | 删除 `.hippocampus_history/` 中的旧归档 |
+
+---
 
 ## 📜 许可证
 
@@ -129,14 +148,4 @@ MIT 许可证 - 详见 [LICENSE](LICENSE)。
 
 ---
 
-## 🤝 贡献
-
-欢迎贡献！请随时提交 Pull Request。
-
-## 📧 联系方式
-
-如有问题或疑问，请在 GitHub 上提交 issue。
-
----
-
-**为在上下文中思考的开发者打造。**
+**为在上下文中思考的开发者打造。** 💡

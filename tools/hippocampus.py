@@ -164,13 +164,20 @@ class HippocampusMemory:
         Save memory state from JSON input.
 
         Args:
-            input_json: JSON string containing memory data
+            input_json: JSON string containing memory data, or file path prefixed with '@'
 
         Returns:
             True if saved successfully, False otherwise
         """
         try:
-            data = json.loads(input_json)
+            # Check if input is a file reference (starts with @)
+            if input_json.startswith('@'):
+                file_path = input_json[1:]  # Remove @ prefix
+                with open(file_path, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+            else:
+                # Parse inline JSON
+                data = json.loads(input_json)
 
             # Enforce schema
             current_data: Dict[str, Any] = {
